@@ -104,7 +104,7 @@ typester++ wrote AnyEvent::JSONRPC::Lite. This module takes A LOT OF CODE from t
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2009 by tokuhirom Inc.
+Copyright (c) 2009 by tokuhirom.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
