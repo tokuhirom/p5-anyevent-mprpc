@@ -42,6 +42,12 @@ use AnyEvent::Handle;
 1;
 __END__
 
+=head1 NAME
+
+AnyEvent::MessagePack - MessagePack stream serializer/deserializer for AnyEvent
+
+=head1 SYNOPSIS
+
     use AnyEvent::MessagePack;
     use AnyEvent::Handle;
 
@@ -53,4 +59,12 @@ __END__
         my ($hdl, $data) = @_;
         # your code here
     });
+
+=head1 DESCRIPTION
+
+AE::MessagePack is MessagePack stream serializer/deserializer for AnyEvent.
+
+=head1 SEE ALSO
+
+L<AnyEvent::Handle>, L<AnyEvent::MPRPC>
 
