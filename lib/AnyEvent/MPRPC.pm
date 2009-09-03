@@ -3,31 +3,114 @@ package AnyEvent::MPRPC;
 use strict;
 use warnings;
 our $VERSION = '0.01';
+use AnyEvent::MPRPC::Server;
+use AnyEvent::MPRPC::Client;
+use base 'Exporter';
+
+our @EXPORT = qw/mprpc_client mprpc_server/;
+
+sub mprpc_client($$) { ## no critic
+    my ($host, $port) = @_;
+
+    AnyEvent::MPRPC::Client->new(
+        host => $host,
+        port => $port,
+    );
+}
+
+sub mprpc_server($$) { ## no critic
+    my ($address, $port) = @_;
+
+    AnyEvent::MRPPC::Server->new(
+        address => $address,
+        port    => $port,
+    );
+}
 
 1;
+
 __END__
 
 =head1 NAME
 
-AnyEvent::MPRPC -
+AnyEvent::MPRPC - Simple TCP-based MPRPC client/server
 
 =head1 SYNOPSIS
 
-  use AnyEvent::MPRPC;
+    use AnyEvent::MPRPC;
+    
+    my $server = mprpc_server '127.0.0.1', '4423';
+    $server->reg_cb(
+        echo => sub {
+            my ($res_cv, @params) = @_;
+            $res_cv->result(@params);
+        },
+    );
+    
+    my $client = mprpc_client '127.0.0.1', '4423';
+    my $d = $client->call( echo => 'foo bar' );
+    
+    my $res = $d->recv; # => 'foo bar';
 
 =head1 DESCRIPTION
 
-AnyEvent::MPRPC is
+This module provide TCP-based MessagePack RPC server/client implementation.
 
-=head1 AUTHOR
+L<AnyEvent::MPRPC> provide you a couple of export functions that are shortcut of L<AnyEvent::MPRPC::Client> and L<AnyEvent::MPRPC::Server>.
+One is C<mprpc_client> for Client, another is C<mprpc_server> for Server.
 
-Tokuhiro Matsuno E<lt>tokuhirom  slkjfd gmail.comE<gt>
+=head1 FUNCTIONS
+
+=head2 mprpc_server $address, $port;
+
+Create L<AnyEvent::MPRPC::Server> object and return it.
+
+This is equivalent to:
+
+    AnyEvent::MPRPC::Server->new(
+        address => $address,
+        port    => $port,
+    );
+
+See L<AnyEvent::MPRPC::Server> for more detail.
+
+=head2 mprpc_client $hostname, $port
+
+Create L<AnyEvent::MPRPC::Client> object and return it.
+
+This is equivalent to:
+
+    AnyEvent::MPRPC::Client->new(
+        host => $hostname,
+        port => $port,
+    );
+
+See L<AnyEvent::MPRPC::Client> for more detail.
 
 =head1 SEE ALSO
 
-=head1 LICENSE
+L<AnyEvent::MPRPC::Client>, L<AnyEvent::MPRPC::Server>.
+L<AnyEvent::JSONRPC::Lite>
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+L<http://d.hatena.ne.jp/viver/20090713/p1>
+
+=head1 AUTHOR
+
+Tokuhiro Matsuno <tokuhirom@cpan.org>
+
+=head1 THANKS TO
+
+typester++ wrote AnyEvent::JSONRPC::Lite. This module takes A LOT OF CODE from that module =P
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2009 by tokuhirom Inc.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
 
 =cut
+

@@ -10,3 +10,17 @@ tokuhirom  slkjfd gmail.com
 AnyEvent::MPRPC
 params
 msgid
+Coro
+Hostname
+MessagePack
+RPC
+Str
+blockingly
+callback
+condvar
+condvars
+occured
+unix
+Daisuke
+KAYAC
+Murase
