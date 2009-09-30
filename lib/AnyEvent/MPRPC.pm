@@ -21,7 +21,7 @@ sub mprpc_client($$) { ## no critic
 sub mprpc_server($$) { ## no critic
     my ($address, $port) = @_;
 
-    AnyEvent::MRPPC::Server->new(
+    AnyEvent::MPRPC::Server->new(
         address => $address,
         port    => $port,
     );
