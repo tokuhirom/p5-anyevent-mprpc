@@ -123,7 +123,7 @@ sub _dispatch {
 
         $handle->push_write( msgpack => [
             MP_TYPE_RESPONSE,
-            $id,
+            int($id), # should be IV.
             $type eq 'error'  ? $result : undef,
             $type eq 'result' ? $result : undef,
         ]) if $handle;
