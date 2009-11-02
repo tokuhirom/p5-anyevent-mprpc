@@ -6,6 +6,7 @@ our $VERSION = '0.04';
 use AnyEvent::MPRPC::Server;
 use AnyEvent::MPRPC::Client;
 use base 'Exporter';
+use 5.008;
 
 our @EXPORT = qw/mprpc_client mprpc_server/;
 

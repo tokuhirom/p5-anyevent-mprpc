@@ -9,9 +9,9 @@ requires 'Any::Moose'        => 0.10;
 tests 't/*.t';
 test_requires 'Test::More'       => 0.94;
 test_requires 'Test::TCP'        => 0.11;
-test_requires 'Test::SharedFork' => 0.05;
 author_tests 'xt';
 
+include_deps 'Test::TCP' => 0.11;
 build_requires 'Test::More';
 use_test_base;
 auto_include;
