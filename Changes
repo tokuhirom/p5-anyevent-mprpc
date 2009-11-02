@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.05
+
+    - fixed packaging issue
+
 0.04
 
     - fixed deps. RT#50463
