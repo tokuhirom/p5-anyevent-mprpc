@@ -29,6 +29,7 @@ use AnyEvent::Handle;
                     $unpacker->reset;
 
                     $buffer = substr($buffer, $nread);
+                    $nread = 0;
                     $succeeded++;
                     next if length($buffer) != 0;
                 }
