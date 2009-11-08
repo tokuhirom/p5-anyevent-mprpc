@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.06
+
+    - bug fix: handle multiple requests
+
 0.05
 
     - fixed packaging issue

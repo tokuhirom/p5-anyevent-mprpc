@@ -65,6 +65,10 @@ AnyEvent::MessagePack - MessagePack stream serializer/deserializer for AnyEvent
 
 AE::MessagePack is MessagePack stream serializer/deserializer for AnyEvent.
 
+=head1 THANKS TO
+
+kazeburo++
+
 =head1 SEE ALSO
 
 L<AnyEvent::Handle>, L<AnyEvent::MPRPC>
