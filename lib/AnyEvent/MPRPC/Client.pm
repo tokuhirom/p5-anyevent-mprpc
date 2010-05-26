@@ -291,12 +291,6 @@ If server returns an error, C<<$cv->recv>> causes croak by using C<<$cv->croak>>
         # ...
     }
 
-=head2 notify ($method, @params)
-
-Same as call method, but not handle response. This method just notify to server.
-
-    $client->call( echo => 'Hello' );
-
 =head1 AUTHOR
 
 Tokuhiro Matsuno <tokuhirom@cpan.org>
