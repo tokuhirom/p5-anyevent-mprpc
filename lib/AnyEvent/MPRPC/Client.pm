@@ -74,11 +74,17 @@ has _connection_guard => (
     isa => 'Object',
 );
 
+has 'on_connect' => (
+    is  => 'ro',
+    isa => 'CodeRef',
+);
+
 no Any::Moose;
 
 sub BUILD {
     my $self = shift;
 
+    my $on_connect = $self->on_connect ? sub { $self->on_connect->($self, @_) } : undef;
     my $guard = tcp_connect $self->host, $self->port, sub {
         my ($fh) = @_
             or return
@@ -108,7 +114,7 @@ sub BUILD {
         }
 
         $self->handler( $handle );
-    };
+    }, $on_connect;
     weaken $self;
 
     $self->_connection_guard($guard);
@@ -253,7 +259,13 @@ This has same arguments as L<AnyEvent::Handle>, and also act as handler's on_err
 
 Default is just croak.
 
-If you want to set other options to handle object, use handler_options option showed below.
+=item on_connect => $cb->($self, $filehandle, $host, $port, $retry)
+
+After the connection is established, then this callback will be invoked.
+
+If the connect is unsuccessful, then the $connect_cb will be invoked without any arguments and $! will be set appropriately.
+
+See '$connect_cb' in L<AnyEvent::Socket> for more details.
 
 =item handler_options => 'HashRef'
 
