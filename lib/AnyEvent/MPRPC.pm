@@ -2,7 +2,7 @@ package AnyEvent::MPRPC;
 
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use AnyEvent::MPRPC::Server;
 use AnyEvent::MPRPC::Client;
 use base 'Exporter';

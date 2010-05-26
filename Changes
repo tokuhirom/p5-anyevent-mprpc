@@ -1,5 +1,10 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.07
+
+    - added on_connect callback for AnyEvent::MPRPC::Client.
+    - doc fix
+
 0.06
 
     - bug fix: handle multiple requests
