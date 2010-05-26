@@ -2,9 +2,9 @@ use inc::Module::Install;
 name 'AnyEvent-MPRPC';
 all_from 'lib/AnyEvent/MPRPC.pm';
 
-requires 'AnyEvent'          => 5.201;
-requires 'Data::MessagePack' => 0.08;
-requires 'Any::Moose'        => 0.10;
+requires 'AnyEvent'          => 5.261;
+requires 'Data::MessagePack' => 0.12;
+requires 'Any::Moose'        => 0.13;
 
 tests 't/*.t';
 test_requires 'Test::More'       => 0.94;
