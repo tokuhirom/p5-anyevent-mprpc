@@ -7,12 +7,15 @@ use File::Temp qw(tempfile);
 use Test::More;
 
 my ($fh, $fname) = tempfile(UNLINK => 0);
-my @ret;
+my @data = ( [ 1, 2, 3 ], [ 4, 5, 6 ] );
+
+my $cv = AE::cv;
 
 {
     my $hdl = AnyEvent::Handle->new(fh => $fh, on_error  => sub { die 'wtf' });
-    $hdl->push_write(msgpack => [1,2,3]);
-    $hdl->push_write(msgpack => [4,5,6]);
+    for my $d (@data) {
+        $hdl->push_write(msgpack => $d);
+    }
     close $fh;
 }
 
@@ -21,23 +24,15 @@ my $hdl = do {
     my $hdl = AnyEvent::Handle->new(fh => $fh, on_error  => sub { die 'wtf' });
     $hdl->push_read(msgpack => sub {
         my ($hdl, $data) = @_;
-        push @ret, $data;
+
+        my $e = shift @data;
+        is_deeply $data, $e;
+        $cv->send() unless @data;
     });
     $hdl;
 };
 
-my $cv = AE::cv;
-my $t; $t = AnyEvent->timer(
-    after    => 0,
-    interval => 1,
-    cb       => sub {
-        if ( @ret == 2 ){
-            undef $t;
-            $cv->send(\@ret);
-        }
-    }
-);
-is_deeply( $cv->recv, [[1,2,3],[4,5,6]] );
+$cv->recv();
 unlink $fname;
 
 done_testing;
