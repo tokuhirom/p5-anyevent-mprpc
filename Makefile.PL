@@ -3,7 +3,7 @@ name 'AnyEvent-MPRPC';
 all_from 'lib/AnyEvent/MPRPC.pm';
 
 requires 'AnyEvent'          => 5.261;
-requires 'Data::MessagePack' => 0.12;
+requires 'Data::MessagePack' => 0.25;
 requires 'Any::Moose'        => 0.13;
 
 tests 't/*.t';
