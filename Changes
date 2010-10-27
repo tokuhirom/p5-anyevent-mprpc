@@ -1,5 +1,11 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.09
+
+    - depended on latest D::MP
+    - save return value of tcp_server().
+      IT MAY INCOMPATBILE CHANGE.
+
 0.08
 
     - depend to latest Data::MessagePack
