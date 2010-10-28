@@ -16,26 +16,30 @@ use AnyEvent::Handle;
     register_read_type(msgpack => sub {
         my ($self, $cb) = @_;
         my $unpacker = Data::MessagePack::Unpacker->new();
-        my $nread = 0;
 
         sub {
-            my $succeeded = 0;
             my $buffer = delete $_[0]{rbuf} or return;
-            while (1) {
+
+            my $complete = 0;
+            my $nread    = 0;
+            while(1) {
                 $nread = $unpacker->execute($buffer, $nread);
                 if ($unpacker->is_finished) {
                     my $ret = $unpacker->data;
                     $cb->( $_[0], $ret );
                     $unpacker->reset;
+                    $complete++;
 
-                    $buffer = substr($buffer, $nread);
-                    $nread = 0;
-                    $succeeded++;
-                    next if length($buffer) != 0;
+                    if( $nread >= length($buffer) ) {
+                        last;
+                    }
                 }
-                last;
+                else {
+                    last;
+                }
+
             }
-            return $succeeded;
+            return $complete;
         }
     });
 }
