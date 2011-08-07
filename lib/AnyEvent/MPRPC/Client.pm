@@ -125,7 +125,7 @@ sub call {
 
     my $request = [
         MP_TYPE_REQUEST,
-        $self->_next_id->(),
+        int( $self->_next_id->() ),
         $method,
         $param,
     ];
@@ -172,15 +172,15 @@ AnyEvent::MPRPC::Client - Simple TCP-based MessagePack RPC client
 =head1 SYNOPSIS
 
     use AnyEvent::MPRPC::Client;
-    
+
     my $client = AnyEvent::MPRPC::Client->new(
         host => '127.0.0.1',
         port => 4423,
     );
-    
+
     # blocking interface
     my $res = $client->call( echo => 'foo bar' )->recv; # => 'foo bar';
-    
+
     # non-blocking interface
     $client->call( echo => 'foo bar' )->cb(sub {
         my $res = $_[0]->recv;  # => 'foo bar';
@@ -286,7 +286,7 @@ If server returns an error, C<<$cv->recv>> causes croak by using C<<$cv->croak>>
 
     my $res;
     eval { $res = $cv->recv };
-    
+
     if (my $error = $@) {
         # ...
     }
