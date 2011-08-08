@@ -123,9 +123,11 @@ sub BUILD {
 sub call {
     my ($self, $method, $param) = @_;
 
+    my $msgid = $self->_next_id->();
+
     my $request = [
         MP_TYPE_REQUEST,
-        int( $self->_next_id->() ),
+        int($msgid), # should be IV
         $method,
         $param,
     ];
@@ -137,7 +139,7 @@ sub call {
         push @{ $self->_request_pool }, $request;
     }
 
-    $self->_callbacks->{ $request->[MP_REQ_MSGID] } = AnyEvent->condvar;
+    $self->_callbacks->{ $msgid } = AnyEvent->condvar;
 }
 
 sub _handle_response {
