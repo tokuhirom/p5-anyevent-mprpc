@@ -8,3 +8,5 @@ MANIFEST
 Makefile.old
 nytprof.out
 .testenv/
+MYMETA.*
+

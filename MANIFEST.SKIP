@@ -20,3 +20,5 @@
 \.git/
 ^\.testenv/
 \.sw[po]$
+MYMETA\.(?:yml|json)$
+
