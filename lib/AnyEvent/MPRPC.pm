@@ -39,7 +39,7 @@ AnyEvent::MPRPC - Simple TCP-based MPRPC client/server
 =head1 SYNOPSIS
 
     use AnyEvent::MPRPC;
-    
+
     my $server = mprpc_server '127.0.0.1', '4423';
     $server->reg_cb(
         echo => sub {
@@ -47,10 +47,10 @@ AnyEvent::MPRPC - Simple TCP-based MPRPC client/server
             $res_cv->result(@params);
         },
     );
-    
+
     my $client = mprpc_client '127.0.0.1', '4423';
     my $d = $client->call( echo => 'foo bar' );
-    
+
     my $res = $d->recv; # => 'foo bar';
 
 =head1 DESCRIPTION
@@ -93,7 +93,9 @@ See L<AnyEvent::MPRPC::Client> for more detail.
 L<AnyEvent::MPRPC::Client>, L<AnyEvent::MPRPC::Server>.
 L<AnyEvent::JSONRPC::Lite>
 
-L<http://d.hatena.ne.jp/viver/20090713/p1>
+L<http://msgpack.org/>
+
+L<http://wiki.msgpack.org/display/MSGPACK/RPC+specification>
 
 =head1 AUTHOR
 
