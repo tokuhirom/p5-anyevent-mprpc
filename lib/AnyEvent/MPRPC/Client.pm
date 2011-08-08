@@ -139,6 +139,7 @@ sub call {
         push @{ $self->_request_pool }, $request;
     }
 
+    # $msgid is stringified, but $request->{MP_RES_MSGID] is still IV
     $self->_callbacks->{ $msgid } = AnyEvent->condvar;
 }
 
