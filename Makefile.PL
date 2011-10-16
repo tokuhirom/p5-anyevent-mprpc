@@ -17,8 +17,8 @@ if($Module::Install::AUTHOR) {
     postamble qq{test :: test_pp\n\n};
 }
 
-include_deps 'Test::TCP' => 0.11;
-build_requires 'Test::More';
+test_requires 'Test::TCP' => 0.11;
+test_requires 'Test::More' => 0.98;
 auto_include;
 WriteAll;
 
