@@ -1,4 +1,6 @@
 package AnyEvent::MPRPC::CondVar;
+use strict;
+use warnings;
 use Any::Moose;
 
 use AnyEvent;

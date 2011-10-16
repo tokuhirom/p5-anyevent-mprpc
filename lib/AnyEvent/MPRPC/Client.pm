@@ -1,4 +1,6 @@
 package AnyEvent::MPRPC::Client;
+use strict;
+use warnings;
 use Any::Moose;
 
 use Carp;

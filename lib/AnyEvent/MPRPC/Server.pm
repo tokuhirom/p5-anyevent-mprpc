@@ -1,4 +1,6 @@
 package AnyEvent::MPRPC::Server;
+use strict;
+use warnings;
 use Any::Moose;
 
 use Carp;

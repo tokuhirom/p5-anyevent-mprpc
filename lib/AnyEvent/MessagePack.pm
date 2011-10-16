@@ -1,6 +1,6 @@
-use warnings;
-use strict;
 package AnyEvent::MessagePack;
+use strict;
+use warnings;
 
 use AnyEvent::Handle;
 
