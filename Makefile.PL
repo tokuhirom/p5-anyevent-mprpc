@@ -19,7 +19,6 @@ if($Module::Install::AUTHOR) {
 
 test_requires 'Test::TCP' => 0.11;
 test_requires 'Test::More' => 0.98;
-auto_include;
 WriteAll;
 
 # copied from Makefile.PL in Text::Xslate.
