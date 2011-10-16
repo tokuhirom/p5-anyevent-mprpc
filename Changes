@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.11
+
+    - modernized packaging
+
 0.10 2011-08-08 10:49:46
 
     - Ensure MsgId to be an integer as the MPRPC specification says
