@@ -22,3 +22,20 @@
 \.sw[po]$
 MYMETA\.(?:yml|json)$
 
+^\.git/
+^[^/]+\.gz$
+^Build$
+^ppport.h$
+^xshelper.h$
+cover_db
+nytprof
+perltidy.ERR$
+^README.pod$
+^README.mkdn$
+^tags$
+^MYMETA\.
+\b_build
+^MANIFEST\.SKIP
+\b\.gitignore
+\.bak$
+^AnyEvent-MPRPC-
