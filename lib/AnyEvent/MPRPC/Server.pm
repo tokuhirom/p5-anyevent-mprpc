@@ -51,6 +51,24 @@ has on_eof => (
     },
 );
 
+has on_accept => (
+    is      => 'rw',
+    isa     => 'CodeRef',
+    lazy    => 1,
+    default => sub {
+        return sub { };
+    },
+);
+
+has on_dispatch => (
+    is      => 'rw',
+    isa     => 'CodeRef',
+    lazy    => 1,
+    default => sub {
+        return sub { };
+    },
+);
+
 has handler_options => (
     is      => 'ro',
     isa     => 'HashRef',
@@ -75,7 +93,9 @@ no Any::Moose;
 sub BUILD {
     my $self = shift;
 
-    my $server = tcp_server $self->address, $self->port, sub {
+    $self->server(tcp_server $self->address, $self->port, sub {
+        $self->on_accept->(@_);
+
         my ($fh, $host, $port) = @_;
         my $indicator = "$host:$port";
 
@@ -101,8 +121,7 @@ sub BUILD {
         });
 
         $self->_handlers->[ fileno($fh) ] = $handle;
-    };
-    $self->server($server);
+    }) unless defined $self->server;
     weaken $self;
 
     $self;
@@ -118,6 +137,9 @@ sub reg_cb {
 
 sub _dispatch {
     my ($self, $indicator, $handle, $request) = @_;
+    $self->on_dispatch->($indicator, $handle, $request);
+    return if $handle->destroyed;
+
     return unless $request and ref $request eq 'ARRAY';
 
     my $target = $self->_callbacks->{ $request->[MP_REQ_METHOD] };
@@ -208,6 +230,10 @@ This is actually L<AnyEvent::Handle>'s on_error.
 =item on_eof => $cb->($handle)
 
 EOF callback. same as L<AnyEvent::Handle>'s on_eof callback.
+
+=item on_accept => $cb->($fh, $host, $port)
+
+=item on_dispatch => $cb->($indicator, $handle, $request);
 
 =item handler_options => 'HashRef'
 
