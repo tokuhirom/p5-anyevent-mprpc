@@ -23,7 +23,10 @@ use AnyEvent::Handle;
             my $complete = 0;
             my $nread    = 0;
             while(1) {
-                $nread = $unpacker->execute($buffer, $nread);
+                unless (eval { $nread = $unpacker->execute($buffer, $nread); 1 }) {
+                    $self->_error(Errno::EBADMSG);
+                    return;
+                }
                 if ($unpacker->is_finished) {
                     my $ret = $unpacker->data;
                     $cb->( $_[0], $ret );
