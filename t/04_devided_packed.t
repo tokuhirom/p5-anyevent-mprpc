@@ -1,4 +1,4 @@
-use Test::More skip_all => 'not yet';
+use Test::More 0.96;
 use AnyEvent::Impl::Perl;
 use AE;
 use AnyEvent::MessagePack;

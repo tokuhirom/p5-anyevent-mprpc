@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.15
+
+    - use Data::MessagePack::Stream instead!
+
 0.14
 
     - Handle bogus data the right way instead throwing an exception...

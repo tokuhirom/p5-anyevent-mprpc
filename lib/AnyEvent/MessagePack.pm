@@ -9,38 +9,25 @@ use AnyEvent::Handle;
         AnyEvent::Handle;
 
     use Data::MessagePack;
+    use Data::MessagePack::Stream;
+
     register_write_type(msgpack => sub {
         my ($self, $data) = @_;
         Data::MessagePack->pack($data);
     });
     register_read_type(msgpack => sub {
         my ($self, $cb) = @_;
-        my $unpacker = Data::MessagePack::Unpacker->new();
+        my $unpacker = Data::MessagePack::Stream->new();
 
         sub {
             my $buffer = delete $_[0]{rbuf} or return;
 
             my $complete = 0;
             my $nread    = 0;
-            while(1) {
-                unless (eval { $nread = $unpacker->execute($buffer, $nread); 1 }) {
-                    $self->_error(Errno::EBADMSG);
-                    return;
-                }
-                if ($unpacker->is_finished) {
-                    my $ret = $unpacker->data;
-                    $cb->( $_[0], $ret );
-                    $unpacker->reset;
-                    $complete++;
-
-                    if( $nread >= length($buffer) ) {
-                        last;
-                    }
-                }
-                else {
-                    last;
-                }
-
+            $unpacker->feed($buffer);
+            while ($unpacker->next) {
+                $cb->( $_[0], $unpacker->data );
+                $complete++;
             }
             return $complete;
         }

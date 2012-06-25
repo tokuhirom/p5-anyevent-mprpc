@@ -32,5 +32,6 @@ my $hdl = do {
     $hdl;
 };
 
-is($cv->recv(), do { local $! = Errno::EBADMSG; "$!" });
+my $err = $cv->recv();
+ok(($err eq do { local $! = Errno::EBADMSG; "$!" }) || ($err eq do { local $! = Errno::EPIPE; "$!"} ), "$err");
 unlink $fname;
