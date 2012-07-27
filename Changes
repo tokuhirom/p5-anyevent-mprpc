@@ -1,5 +1,11 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.16
+
+    - Fixes RT#74518: issue
+    Bug #74518 for AnyEvent-MPRPC: AnyEvent::MessagePack read type corrupts responses
+    (fixed By Max++, and reported by asguthrie++)
+
 0.15
 
     - use Data::MessagePack::Stream instead!
