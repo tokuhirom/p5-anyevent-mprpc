@@ -17,13 +17,17 @@ use AnyEvent::Handle;
     });
     register_read_type(msgpack => sub {
         my ($self, $cb) = @_;
-        my $unpacker = Data::MessagePack::Stream->new();
+
+	# FIXME This implementation eats all the data, so the stream may
+	# contain only MessagePack packets.
+
+        my $unpacker = $self->{_msgpack} ||= Data::MessagePack::Stream::->new;
 
         sub {
-            my $buffer = delete $_[0]{rbuf} or return;
+            my $buffer = delete $_[0]{rbuf};
+            return if $buffer eq '';
 
             my $complete = 0;
-            my $nread    = 0;
             $unpacker->feed($buffer);
             while ($unpacker->next) {
                 $cb->( $_[0], $unpacker->data );
