@@ -105,11 +105,7 @@ sub BUILD {
             fh => $fh,
         );
 
-        $handle->on_read(sub {
-            shift->unshift_read(msgpack => sub {
-                $self->_handle_response( $_[1] );
-            });
-        });
+        $handle->unshift_read(msgpack => $self->_handle_response_cb);
 
         while (my $pooled = shift @{ $self->_request_pool }) {
             $handle->push_write( msgpack => $pooled );
@@ -145,25 +141,35 @@ sub call {
     $self->_callbacks->{ $msgid } = AnyEvent->condvar;
 }
 
-sub _handle_response {
-    my ($self, $res) = @_;
+sub _handle_response_cb {
+    my $self = shift;
 
-    my $d = delete $self->_callbacks->{ $res->[MP_RES_MSGID] };
+    weaken $self;
 
-    if (my $error = $res->[MP_RES_ERROR]) {
-        if ($d) {
-            $d->croak($error);
-        } else {
-            Carp::croak($error);
+    return sub {
+        $self || return;
+
+        my ($handle, $res) = @_;
+
+        my $d = delete $self->_callbacks->{ $res->[MP_RES_MSGID] };
+
+        if (my $error = $res->[MP_RES_ERROR]) {
+            if ($d) {
+                $d->croak($error);
+            } else {
+                Carp::croak($error);
+            }
         }
-    }
 
-    if ($d) {
-        $d->send($res->[MP_RES_RESULT]);
-    } else {
-        warn q/Invalid response from server/;
-        return;
-    }
+        $handle->unshift_read(msgpack => $self->_handle_response_cb);
+
+        if ($d) {
+            $d->send($res->[MP_RES_RESULT]);
+        } else {
+            warn q/Invalid response from server/;
+            return;
+        }
+    };
 }
 
 __PACKAGE__->meta->make_immutable;

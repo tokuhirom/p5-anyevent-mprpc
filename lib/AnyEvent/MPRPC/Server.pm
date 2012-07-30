@@ -114,11 +114,8 @@ sub BUILD {
             %{ $self->handler_options },
             fh => $fh,
         );
-        $handle->on_read(sub {
-            shift->unshift_read( msgpack => sub {
-                $self->_dispatch($indicator, @_);
-            }),
-        });
+
+        $handle->unshift_read(msgpack => $self->_dispatch_cb($indicator));
 
         $self->_handlers->[ fileno($fh) ] = $handle;
     }) unless defined $self->server;
@@ -135,39 +132,49 @@ sub reg_cb {
     }
 }
 
-sub _dispatch {
-    my ($self, $indicator, $handle, $request) = @_;
-    $self->on_dispatch->($indicator, $handle, $request);
-    return if $handle->destroyed;
+sub _dispatch_cb {
+    my ($self, $indicator) = @_;
 
-    return unless $request and ref $request eq 'ARRAY';
+    weaken $self;
 
-    my $target = $self->_callbacks->{ $request->[MP_REQ_METHOD] };
+    return sub {
+        $self || return;
 
-    my $id = $request->[MP_REQ_MSGID];
-    $indicator = "$indicator:$id";
+        my ($handle, $request) = @_;
+        $self->on_dispatch->($indicator, $handle, $request);
+        return if $handle->destroyed;
 
-    my $res_cb = sub {
-        my $type   = shift;
-        my $result = @_ > 1 ? \@_ : $_[0];
+        $handle->unshift_read(msgpack => $self->_dispatch_cb($indicator));
 
-        $handle->push_write( msgpack => [
-            MP_TYPE_RESPONSE,
-            int($id), # should be IV.
-            $type eq 'error'  ? $result : undef,
-            $type eq 'result' ? $result : undef,
-        ]) if $handle;
+        return unless $request and ref $request eq 'ARRAY';
+
+        my $target = $self->_callbacks->{ $request->[MP_REQ_METHOD] };
+
+        my $id = $request->[MP_REQ_MSGID];
+        $indicator = "$indicator:$id";
+
+        my $res_cb = sub {
+            my $type   = shift;
+            my $result = @_ > 1 ? \@_ : $_[0];
+
+            $handle->push_write( msgpack => [
+                MP_TYPE_RESPONSE,
+                int($id), # should be IV.
+                $type eq 'error'  ? $result : undef,
+                $type eq 'result' ? $result : undef,
+            ]) if $handle;
+        };
+        weaken $handle;
+
+        my $cv = AnyEvent::MPRPC::CondVar->new;
+        $cv->_cb(
+            sub { $res_cb->( result => $_[0]->recv ) },
+            sub { $res_cb->( error  => $_[0]->recv ) },
+        );
+
+        $target ||= sub { shift->error(qq/No such method "@{[ $request->[MP_REQ_METHOD] ]}" found/) };
+        $target->( $cv, $request->[MP_REQ_PARAMS] );
     };
-    weaken $handle;
-
-    my $cv = AnyEvent::MPRPC::CondVar->new;
-    $cv->_cb(
-        sub { $res_cb->( result => $_[0]->recv ) },
-        sub { $res_cb->( error  => $_[0]->recv ) },
-    );
-
-    $target ||= sub { shift->error(qq/No such method "@{[ $request->[MP_REQ_METHOD] ]}" found/) };
-    $target->( $cv, $request->[MP_REQ_PARAMS] );
 }
 
 __PACKAGE__->meta->make_immutable;
