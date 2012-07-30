@@ -25,15 +25,14 @@ use AnyEvent::Handle;
 
         sub {
             my $buffer = delete $_[0]{rbuf};
-            return if $buffer eq '';
 
-            my $complete = 0;
-            $unpacker->feed($buffer);
-            while ($unpacker->next) {
+            $unpacker->feed($buffer) if defined $buffer;
+
+            if ($unpacker->next) {
                 $cb->( $_[0], $unpacker->data );
-                $complete++;
+                return 1;
             }
-            return $complete;
+            return 0;
         }
     });
 }
