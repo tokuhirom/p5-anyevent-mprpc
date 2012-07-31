@@ -10,7 +10,7 @@ test_tcp(
         my $port = shift;
         my $w = AnyEvent->signal( signal => 'PIPE', cb => sub { warn "SIGPIPE" } );
 
-        my $server = AnyEvent::MPRPC::Server->new(host => '127.0.0.1', port => $port);
+        my $server = AnyEvent::MPRPC::Server->new(host => '127.0.0.1', port => $port, on_error => sub {});
         $server->reg_cb(
             sum => sub {
                 my ($res_cv, $args) = @_;
