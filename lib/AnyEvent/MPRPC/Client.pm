@@ -119,10 +119,11 @@ sub BUILD {
 }
 
 sub call {
-    my ($self, $method, $param) = @_;
+    my ($self, $method, @params) = @_;
 
     my $msgid = $self->_next_id->();
 
+    my $param = ref $params[0] eq 'ARRAY' ? $params[0] : \@params;
     my $request = [
         MP_TYPE_REQUEST,
         int($msgid), # should be IV
@@ -286,7 +287,7 @@ Default is empty.
 
 =back
 
-=head2 call ($method, @params)
+=head2 call ($method, (@params | \@params))
 
 Call remote method named C<$method> with parameters C<@params>. And return condvar object for response.
 
