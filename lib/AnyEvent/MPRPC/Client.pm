@@ -119,11 +119,11 @@ sub BUILD {
 }
 
 sub call {
-    my ($self, $method, @params) = @_;
+    my ($self, $method) = (shift, shift);
+    my $param = (@_ == 1 && ref $_[0] eq "ARRAY") ? $_[0] : [@_];
 
     my $msgid = $self->_next_id->();
 
-    my $param = ref $params[0] eq 'ARRAY' ? $params[0] : \@params;
     my $request = [
         MP_TYPE_REQUEST,
         int($msgid), # should be IV
