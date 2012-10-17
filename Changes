@@ -1,5 +1,10 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.18
+
+    - AnyEvent::MPRPC::Client 'call' method can take scalar as RPC parameters
+      (It has been able to take only ArrayRef).
+
 0.17
 
     commit 4f6db620d1b0b86f776946f4d8688dc9fc69c966
