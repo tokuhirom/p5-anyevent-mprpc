@@ -38,6 +38,9 @@ test_tcp(
         $ret = $client->call('sum' => (1..10))->recv;
         is $ret, 55, 'pass Array';
 
+        $ret = $client->call('sum' => 1)->recv;
+        is $ret, 1, 'pass one param';
+
         done_testing;
     },
 );
