@@ -1,5 +1,10 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.19
+
+    - Split AnyEvent::MessagePack to it's own distribution.
+      (tokuhirom)
+
 0.18
 
     - AnyEvent::MPRPC::Client 'call' method can take scalar as RPC parameters
