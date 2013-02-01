@@ -1,5 +1,10 @@
 Revision history for Perl extension AnyEvent::MPRPC
 
+0.20 2013-02-01T21:28:13
+
+    - Add 2 callbacks (before/after_connect) and 1 option (connect_timeout)
+      (hirose31)
+
 0.19
 
     - Split AnyEvent::MessagePack to it's own distribution.
