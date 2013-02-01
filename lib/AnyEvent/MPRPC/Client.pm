@@ -24,6 +24,11 @@ has port => (
     required => 1,
 );
 
+has connect_timeout => (
+    is       => 'ro',
+    isa      => 'Int|Str',
+);
+
 has handler => (
     is  => 'rw',
     isa => 'AnyEvent::Handle',
@@ -76,6 +81,17 @@ has _connection_guard => (
     isa => 'Object',
 );
 
+has 'before_connect' => (
+    is  => 'ro',
+    isa => 'CodeRef',
+);
+
+has 'after_connect' => (
+    is  => 'ro',
+    isa => 'CodeRef',
+);
+
+# depreciated!
 has 'on_connect' => (
     is  => 'ro',
     isa => 'CodeRef',
@@ -86,14 +102,17 @@ no Any::Moose;
 sub BUILD {
     my $self = shift;
 
-    my $on_connect = $self->on_connect ? sub { $self->on_connect->($self, @_) } : undef;
+    my $after_connect = $self->after_connect ? sub { $self->after_connect->($self, @_) } : undef;
     my $guard = tcp_connect $self->host, $self->port, sub {
-        my ($fh) = @_
+        my $fh = shift
             or return
                 $self->on_error->(
                     undef, 1,
                     "Failed to connect $self->{host}:$self->{port}: $!",
                 );
+        my($host, $port, $retry) = @_;
+        $self->after_connect
+            and $self->after_connect->($self, $fh, $host, $port, $retry);
 
         my $handle = AnyEvent::Handle->new(
             on_error => sub {
@@ -112,7 +131,23 @@ sub BUILD {
         }
 
         $self->handler( $handle );
-    }, $on_connect;
+    }, sub {
+        my $connect_timeout;
+
+        $self->before_connect
+            and $self->before_connect->($self, @_);
+
+        # on_conect is depreciated!
+        $self->on_connect
+            and $connect_timeout = $self->on_connect->($self, @_);
+
+        # For backward compatibility, if connect_timeout option isn't specifed
+        # use return value of on_connect callback as connect timeout seconds.
+        $self->connect_timeout
+            and $connect_timeout = $self->connect_timeout;
+
+        return $connect_timeout;
+    };
     weaken $self;
 
     $self->_connection_guard($guard);
@@ -271,13 +306,26 @@ This has same arguments as L<AnyEvent::Handle>, and also act as handler's on_err
 
 Default is just croak.
 
-=item on_connect => $cb->($self, $filehandle, $host, $port, $retry)
+=item before_connect => $cb->($self, $filehandle)
+
+It will be called with the file handle in not-yet-connected state as only argument.
+
+=item after_connect => $cb->($self, $filehandle, $host, $port, $retry)
 
 After the connection is established, then this callback will be invoked.
 
-If the connect is unsuccessful, then the $connect_cb will be invoked without any arguments and $! will be set appropriately.
+If the connect is unsuccessful, then the on_error callback will be invoked.
 
-See '$connect_cb' in L<AnyEvent::Socket> for more details.
+=item on_connect => $cb->($self, $filehandle)
+
+It will be called with the file handle in not-yet-connected state as only argument.
+
+    *******************************************************************
+     The on_connect callback is deprecated! Please use before_connect
+     (same as $prepare_cb of AnyEvent::Socket#tcp_connect) or
+     after_connect (which call in $connect_cb of
+     AnyEvent::Socket#tcp_connect).
+    *******************************************************************
 
 =item handler_options => 'HashRef'
 
