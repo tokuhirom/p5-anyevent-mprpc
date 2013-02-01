@@ -23,15 +23,20 @@ test_tcp(
     },
     client => sub {
         my $port = shift;
-        my $cv = AE::cv();
+        my $cvp = AE::cv();
+        my $cvc = AE::cv();
         my $client = AnyEvent::MPRPC::Client->new(
             host => '127.0.0.1',
             port => $port,
-            on_connect => sub {
-                $cv->send('connected');
+            before_connect => sub {
+                $cvp->send('connecting');
+            },
+            after_connect  => sub {
+                $cvc->send('connected');
             },
         );
-        is $cv->recv(), 'connected', "connected";
+        is $cvp->recv(), 'connecting', "connecting";
+        is $cvc->recv(), 'connected', "connected";
         my $ret = $client->call('sum' => [qw/1 2 3/])->recv;
         is $ret, 6, 'pass params as ArrayRef';
 
